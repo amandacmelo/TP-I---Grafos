@@ -1,3 +1,6 @@
+import time
+import os
+
 def ordem(grafo):
   return len(grafo) - 1
 
@@ -34,49 +37,64 @@ def verificaArticulacao(grafo, vertice):
 
   visitados = [False] * (ordem(grafo) + 1)
   visitados[vertice] = True  
- 
+
   if vertice == 1:
     dfs(grafo, 2, visitados)
   else:
     dfs(grafo, 1, visitados)
-  print(visitados)
-  print(buscaOriginal)
 
   for i in range(1, ordem(grafo) + 1):
     if visitados[i] != buscaOriginal[i] and i != vertice:
       return True
   return False
 
-
-def bfs(grafo, vertice, operacao):  #Busca em largura 
+def bfs(grafo, vertice, operacao):  # Busca em largura considerando toda a floresta
+ 
   visitados = [False] * (ordem(grafo) + 1)
-  ordemVisita = []
-  fila = [vertice]
-  visitados[vertice] = True
-  ordemVisita.append(vertice)
+  
+  florestasOrdemVisita = []
   arestasRetorno = []
   arestasNormal = []
 
-  while fila:
-    atual = fila.pop(0)
-    for vizinho in vizinhos(grafo, atual):
-      print(atual, vizinho)
-      if not visitados[vizinho]:
-        visitados[vizinho] = True
-        fila.append(vizinho)
-        ordemVisita.append(vizinho)
-        arestasNormal.append((atual, vizinho))
-      else:
-        if(atual != vertice and vizinho != vertice and (vizinho, atual) not in arestasRetorno and (vizinho, atual) not in arestasNormal):
-          arestasRetorno.append((atual, vizinho))
-  if operacao == 1:
-    return ordemVisita
-  elif operacao == 2:
-    return arestasRetorno  
-  else:
-    print("Ordem de visita:", ordemVisita)
-    print("Arestas de retorno:", arestasRetorno)
+  # Função interna para realizar a busca em largura a partir de um vértice específico
+  def bfs_componente(vertice):
+    fila = [vertice]  
+    visitados[vertice] = True  
+    ordemVisita = [vertice] 
 
+    while fila: 
+      atual = fila.pop(0) 
+      for vizinho in vizinhos(grafo, atual):  
+        if not visitados[vizinho]: 
+          visitados[vizinho] = True  
+          fila.append(vizinho) 
+          ordemVisita.append(vizinho) 
+          arestasNormal.append((atual, vizinho))  # Adiciona a aresta normal
+        else:
+          # Se o vizinho já foi visitado e não é o vértice inicial, adiciona como aresta de retorno
+          if (atual != vertice and vizinho != vertice and 
+              (vizinho, atual) not in arestasRetorno and 
+              (vizinho, atual) not in arestasNormal):
+            arestasRetorno.append((atual, vizinho))
+
+    florestasOrdemVisita.append(ordemVisita)  # Adiciona a ordem de visita da componente à lista de florestas
+
+  # Inicia a busca a partir do vértice escolhido
+  bfs_componente(vertice)
+
+  # Continua a busca para os vértices não visitados
+  for vertice in range(1, ordem(grafo) + 1):
+    if not visitados[vertice]: 
+      bfs_componente(vertice)  # Realiza a busca em largura a partir desse vértice
+
+  if operacao == 1:
+    return florestasOrdemVisita  
+  elif operacao == 2:
+    return arestasRetorno 
+  else:
+    print("Ordem de visita por componente:", florestasOrdemVisita)
+    print("Arestas de retorno:", arestasRetorno)
+    
 
 def componentesConexas(grafo):
   visitados = [False] * (ordem(grafo) + 1)
@@ -127,7 +145,7 @@ def leituraArquivo(nome):
     with open(nome, 'r') as arquivo:
       tamanho = int(arquivo.readline().strip()) 
       grafo = [[0 for _ in range(tamanho + 1)] for _ in range(tamanho + 1)]
-      
+
       linhas =  arquivo.readlines()
       for linha in linhas:
         inicio, fim, peso = map(str, linha.split())
@@ -144,15 +162,75 @@ def leituraArquivo(nome):
 
   return grafo
 
-
 def main():
   #nome = input("Digite o caminho do arquivo: ")
   nome = "teste.txt"
   grafo = leituraArquivo(nome)
 
+  print("Bem-vindo à biblioteca de grafos não direcionados ponderados!\n")
+
+  print("Matriz de pesos:")
   for linha in grafo:
     print(linha)
-  print("resultado")
-        
+
+  opcao = int(1)
+  while (opcao != 0):
+      print("\nEscolha uma opção:")
+      print("1 - Retornar a ordem do grafo")
+      print("2 - Retornar o tamanho do grafo")
+      print("3 - Retornar a densidade ε(G) do grafo")
+      print("4 - Retornar os vizinhos de um vértice fornecido")
+      print("5 - Retornar o grau de um vértice fornecido")
+      print("6 - Verificar se um vértice é articulação")
+      print("7 - Retornar a sequência de vértices visitados na busca em largura e informar a(s) aresta(s) que não faz(em) parte da árvore de busca em largura")
+      print("8 - Retornar o número de componentes conexas do grafo e os vértices de cada componente")
+      print("9 - Verificar se um grafo possui ciclo")
+      print("10 - Retornar a distância e o caminho mínimo")
+      print("0 - Sair\n")
+
+      opcao = int(input("Digite a opção desejada: "))
+
+      match opcao:
+        case 0:
+          break
+        case 1:
+          print("Ordem do grafo:", ordem(grafo))
+        case 2:
+          print("Tamanho do grafo:", tamanho(grafo))
+        case 3:
+          print(f"Densidade do grafo: {densidade(grafo):.2f}")
+        case 4:
+          vertice = int(input("Digite o vértice: "))
+          print(f"Vizinhos do vértice {vertice}: {vizinhos(grafo, vertice)}")
+        case 5:
+          vertice = int(input("Digite o vértice: "))
+          print(f"Grau do vértice {vertice}: {grauVertice(grafo, vertice)}")
+        case 6:
+          vertice = int(input("Digite o vértice: "))
+          if(verificaArticulacao(grafo, vertice) == True):
+            print(f"O vértice {vertice} é uma articulação")
+          else:
+            print(f"O vértice {vertice} não é uma articulação")
+        case 7:
+          vertice = int(input("Digite o vértice pelo qual deseja iniciar a busca: "))
+          print(f"Busca em largura a partir do vértice {vertice}: ")
+          bfs(grafo, vertice, 3)
+        case 8:
+          componentes = componentesConexas(grafo)
+          print("Número de componentes conexas:", len(componentes))
+          for i, componente in enumerate(componentes):
+            print(f"Componente {i+1}: {componente}")
+        case 9:
+          if(possuiCiclo(grafo)):
+            print("O grafo possui ciclo")
+          else:
+            print("O grafo não possui ciclo")
+        case 10:
+          print("Função de determinar distância e caminho mínimo ainda não implementada.")
+        case _:
+          print("Opção inválida. Tente novamente.")
+      input("Pressione Enter para continuar...")
+      os.system('cls' if os.name == 'nt' else 'clear')
+
 if __name__ == "__main__":
   main()
