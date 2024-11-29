@@ -1,6 +1,7 @@
 import os
 
 from bibliotecaGrafos import *
+
 def leituraArquivo(nome):
   grafo = []
   try:
@@ -70,7 +71,7 @@ def main():
           print(f"Grau do vértice {vertice}: {grauVertice(grafo, vertice)}")
         case 6:
           vertice = int(input("Digite o vértice: "))
-          if(verificaArticulacao(grafo, vertice) == True):
+          if(verificaArticulacao(grafo, vertice)):
             print(f"O vértice {vertice} é uma articulação")
           else:
             print(f"O vértice {vertice} não é uma articulação")

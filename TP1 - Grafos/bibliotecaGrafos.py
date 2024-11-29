@@ -1,13 +1,13 @@
 def ordem(grafo):
-  return len(grafo) - 1
+  return len(grafo) - 1 #Retorna o tamanho da matriz - 1, pois a matriz é indexada de 1 a n
 
 def tamanho(grafo):
   tamanho = 0
   for linha in grafo:
     for i in range(1, ordem(grafo)+1):
-      if linha[i] != 0:
+      if linha[i] != 0: #Verifica se existe uma aresta entre os vértices
         tamanho += 1
-  return tamanho // 2
+  return tamanho // 2 # A divisão por 2 é necessária para evitar a contagem de arestas duplicadas em grafos não direcionados.
 
 def densidade(grafo):
   return tamanho(grafo)/ordem(grafo)
@@ -15,13 +15,14 @@ def densidade(grafo):
 def vizinhos(grafo, vertice):
   vizinhos = []
   for i in range(1, ordem(grafo)+1):
-    if grafo[vertice][i] != 0:
-      vizinhos.append(i)
+    if grafo[vertice][i] != 0: #Verifica se existe uma aresta entre os vértices, verificando se o peso é diferente de 0
+      vizinhos.append(i) #Adiciona o vértice à lista de vizinhos
   return vizinhos
 
 def grauVertice(grafo, vertice):
-  return len(vizinhos(grafo, vertice))
+  return len(vizinhos(grafo, vertice)) #Retorna o tamanho da lista de vizinhos, logo o grau do vértice
 
+# A função usa busca em profundidade para explorar o grafo e identifica se a remoção do vértice desconecta componentes
 def verificaArticulacao(grafo, vertice):
   def dfs(grafo, vertice, visitados): #Busca em profundidade
     visitados[vertice] = True
@@ -32,17 +33,20 @@ def verificaArticulacao(grafo, vertice):
   buscaOriginal =  [False] * (ordem(grafo) + 1)
   dfs(grafo, 1, buscaOriginal)
 
+ # Marca o vértice de articulação como visitado
   visitados = [False] * (ordem(grafo) + 1)
   visitados[vertice] = True  
 
+  # Realiza a busca em profundidade após a remoção do vértice
   if vertice == 1:
     dfs(grafo, 2, visitados)
   else:
     dfs(grafo, 1, visitados)
 
+  # Verifica se a remoção do vértice desconecta o grafo
   for i in range(1, ordem(grafo) + 1):
     if visitados[i] != buscaOriginal[i] and i != vertice:
-      return True
+      return True  # O vértice é um ponto de articulação
   return False
 
 def bfs(grafo, vertice, operacao):  # Busca em largura considerando toda a floresta
@@ -95,7 +99,7 @@ def bfs(grafo, vertice, operacao):  # Busca em largura considerando toda a flore
 
 def componentesConexas(grafo):
   visitados = [False] * (ordem(grafo) + 1)
-  componentes = []
+  componentes = [] # Lista para armazenar as componentes
 
   def dfs(grafo, vertice, componente):
     visitados[vertice] = True
@@ -108,12 +112,13 @@ def componentesConexas(grafo):
     if not visitados[vertice]:
       componente = []
       dfs(grafo, vertice, componente)
-      componentes.append(componente)
+      componentes.append(componente) # Adiciona a componente encontrada.
 
   return componentes
 
+# Retorna a quantidade de componentes conexas no grafo.
 def qtdComponentesConexas(grafo):
-  return len(componentesConexas(grafo))
+  return len(componentesConexas(grafo)) #Retorna o tamanho da lista de componentes  
 
 
 def possuiCiclo(grafo):
@@ -147,7 +152,7 @@ def floyd_warshall(grafo):
             if i == j:
                 L[i - 1][j - 1] = 0  # Distância para si mesmo é 0
             elif grafo[i][j] != 0:
-                L[i - 1][j - 1] = grafo[i][j]
+                L[i - 1][j - 1] = grafo[i][j] # Distância de arestas existentes
 
     # Regra de inicialização da matriz R
     for i in range(n):
@@ -181,12 +186,11 @@ def reconstruir_caminho(R, start, end):
     caminho = []
     atual = end
     while atual != start:
-        caminho.append(atual+1)
-        atual = R[start][atual]
-    caminho.append(start+1)
-    caminho.reverse()
-    return caminho
-
+        caminho.append(atual + 1)  # Adiciona o vértice atual ao caminho (ajusta para a indexação 1)
+        atual = R[start][atual]  # Move para o predecessor do vértice atual
+    caminho.append(start + 1)  # Adiciona o vértice de origem ao caminho
+    caminho.reverse()  # Reverte a lista para ter o caminho na ordem correta (do início ao fim)
+    return caminho  # Retorna o caminho reconstruído
 
 def obter_caminhos_e_distancias(grafo, vertice):
     
@@ -198,10 +202,10 @@ def obter_caminhos_e_distancias(grafo, vertice):
     caminhos = {}
     n = ordem(grafo)  
     for destino in range(n):
-        caminho = reconstruir_caminho(R, vertice, destino)
+        caminho = reconstruir_caminho(R, vertice, destino) # Reconstrói o caminho do vértice de origem ao de destino
         caminhos[destino] = {
             "distancia": L[vertice][destino],
             "caminho": caminho
         }
-    return caminhos
+    return caminhos # Retorna o dicionário com as distâncias e caminhos mínimos para todos os vértices
 
