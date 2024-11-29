@@ -36,10 +36,10 @@ def main():
 
   print("Bem-vindo(a) à biblioteca de grafos não direcionados ponderados!\n")
   while True:
-      nome_arquivo = input("Digite o caminho do arquivo: ").strip()
+      nome_arquivo = input("Digite o caminho do arquivo: ").strip() # Remove espaços em branco do início e do fim da string
       grafo = leituraArquivo(nome_arquivo)
 
-      if grafo is not None:
+      if grafo is not None: # Se o grafo foi carregado com sucesso, interrompe o loop
           print("Grafo carregado com sucesso!")
           break
       else:
