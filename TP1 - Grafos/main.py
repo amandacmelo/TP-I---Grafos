@@ -20,23 +20,23 @@ def leituraArquivo(nome):
 
   except FileNotFoundError:
     print("Erro: O arquivo não foi encontrado.")
+    exit(1)
   except Exception as nome:
     print(f"Erro ao ler o arquivo: {nome}")
+    exit(1)
 
   return grafo
 
+def verificaValorVertice(grafo, vertice):
+  if(vertice > ordem(grafo) or vertice < 0):
+    return 1 # indica que foi informado um vertice que esta fora do intervalo do grafo
+  return 0
+
 def main():
-  #nome = input("Digite o caminho do arquivo: ")
-  nome = "teste.txt"
-  grafo = leituraArquivo(nome)
 
   print("Bem-vindo(a) à biblioteca de grafos não direcionados ponderados!\n")
-  '''
-  print("Matriz de pesos:")
-  for linha in grafo:
-    print(linha)
-  '''
-  
+  nome = input("Digite o caminho do arquivo: ")
+  grafo = leituraArquivo(nome)
   opcao = int(1)
   while (opcao != 0):
       print("\nEscolha uma opção:")
@@ -65,18 +65,30 @@ def main():
           print(f"Densidade do grafo: {densidade(grafo):.2f}")
         case 4:
           vertice = int(input("Digite o vértice: "))
+          while(verificaValorVertice(grafo, vertice)):
+            print("Valor Inválido! Por favor digite um número que esteja no intervalo do grafo")
+            vertice = int(input("Digite o vértice: "))
           print(f"Vizinhos do vértice {vertice}: {vizinhos(grafo, vertice)}")
         case 5:
           vertice = int(input("Digite o vértice: "))
+          while(verificaValorVertice(grafo, vertice)):
+            print("Valor Inválido! Por favor digite um número que esteja no intervalo do grafo")
+            vertice = int(input("Digite o vértice: "))
           print(f"Grau do vértice {vertice}: {grauVertice(grafo, vertice)}")
         case 6:
           vertice = int(input("Digite o vértice: "))
+          while(verificaValorVertice(grafo, vertice)):
+            print("Valor Inválido! Por favor digite um número que esteja no intervalo do grafo")
+            vertice = int(input("Digite o vértice: "))
           if(verificaArticulacao(grafo, vertice)):
             print(f"O vértice {vertice} é uma articulação")
           else:
             print(f"O vértice {vertice} não é uma articulação")
         case 7:
           vertice = int(input("Digite o vértice pelo qual deseja iniciar a busca: "))
+          while(verificaValorVertice(grafo, vertice)):
+            print("Valor Inválido! Por favor digite um número que esteja no intervalo do grafo")
+            vertice = int(input("Digite o vértice pelo qual deseja iniciar a busca: "))
           print(f"Busca em largura a partir do vértice {vertice}: ")
           bfs(grafo, vertice, 3)
         case 8:
@@ -90,7 +102,10 @@ def main():
           else:
             print("O grafo não possui ciclo")
         case 10:
-          vertice = int(input("Digite o vértice de origem: "))
+          vertice = int(input("Digite o vértice: "))
+          while(verificaValorVertice(grafo, vertice)):
+            print("Valor Inválido! Por favor digite um número que esteja no intervalo do grafo")
+            vertice = int(input("Digite o vértice: "))
           resultados = obter_caminhos_e_distancias(grafo, vertice)
           if resultados is None:
             print("O grafo possui ciclo negativo.")

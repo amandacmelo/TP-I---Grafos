@@ -179,7 +179,7 @@ def floyd_warshall(grafo):
     return L, R
 
 def reconstruir_caminho(R, start, end):
-    """Reconstrói o caminho mínimo de start a end usando a matriz R."""
+    """Reconstrói o caminho mínimo de start a end usando a matriz R"""
     if R[start][end] is None:
         return None  # Não há caminho entre os vértices
     
@@ -198,11 +198,13 @@ def obter_caminhos_e_distancias(grafo, vertice):
     if L is None or R is None:
         return None
     vertice -= 1  # Ajusta o índice do vértice para a matriz L
-    """Retorna as distâncias e os caminhos mínimos do vértice dado para todos os outros."""
+    """Retorna as distâncias e os caminhos mínimos do vértice dado para todos os outros"""
     caminhos = {}
     n = ordem(grafo)  
     for destino in range(n):
+        
         caminho = reconstruir_caminho(R, vertice, destino) # Reconstrói o caminho do vértice de origem ao de destino
+        # Foi utilizado um dicionario devido a sua facilidade para diferenciar as duas informações retornadas
         caminhos[destino] = {
             "distancia": L[vertice][destino],
             "caminho": caminho
